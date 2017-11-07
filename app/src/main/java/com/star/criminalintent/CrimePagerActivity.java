@@ -11,6 +11,8 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Button;
 
+import com.star.criminalintent.model.Crime;
+
 import java.util.List;
 import java.util.UUID;
 

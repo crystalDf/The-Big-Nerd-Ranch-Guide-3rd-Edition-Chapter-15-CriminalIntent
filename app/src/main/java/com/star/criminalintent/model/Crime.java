@@ -1,4 +1,4 @@
-package com.star.criminalintent;
+package com.star.criminalintent.model;
 
 
 import java.text.SimpleDateFormat;
@@ -13,6 +13,7 @@ public class Crime {
     private Date mDate;
     private boolean mSolved;
     private boolean mRequiresPolice;
+    private Suspect mSuspect;
 
     public Crime() {
         this(UUID.randomUUID());
@@ -57,6 +58,14 @@ public class Crime {
 
     public void setRequiresPolice(boolean requiresPolice) {
         mRequiresPolice = requiresPolice;
+    }
+
+    public Suspect getSuspect() {
+        return mSuspect;
+    }
+
+    public void setSuspect(Suspect suspect) {
+        mSuspect = suspect;
     }
 
     public String getFormattedDate() {

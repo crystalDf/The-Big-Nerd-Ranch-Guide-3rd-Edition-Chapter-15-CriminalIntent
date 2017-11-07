@@ -21,6 +21,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.star.criminalintent.model.Crime;
+
 import java.util.List;
 
 public class CrimeListFragment extends Fragment {

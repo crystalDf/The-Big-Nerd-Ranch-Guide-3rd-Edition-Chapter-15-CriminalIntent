@@ -19,7 +19,11 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 
+import com.star.criminalintent.model.Crime;
+
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 import java.util.UUID;
 
 public class CrimeFragment extends Fragment {
@@ -176,5 +180,30 @@ public class CrimeFragment extends Fragment {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private String getCrimeReport() {
+        String solvedString = mCrime.isSolved()
+                ? getString(R.string.crime_report_solved)
+                : getString(R.string.crime_report_unsolved);
+
+        String requiresPoliceString = mCrime.isRequiresPolice()
+                ? getString(R.string.crime_report_requires_police)
+                : getString(R.string.crime_report_no_requires_police);
+
+        String dateFormat = "EEE, MMM dd";
+        String dateString = new SimpleDateFormat(dateFormat, Locale.US)
+                .format(mCrime.getDate());
+
+        String displayName;
+        if (mCrime.getSuspect() == null ||
+                (displayName = mCrime.getSuspect().getDisplayName()) == null) {
+            displayName = getString(R.string.crime_report_no_suspect);
+        } else {
+            displayName = getString(R.string.crime_report_suspect, displayName);
+        }
+
+        return getString(R.string.crime_report, mCrime.getTitle(), dateString,
+                solvedString, requiresPoliceString, displayName);
     }
 }

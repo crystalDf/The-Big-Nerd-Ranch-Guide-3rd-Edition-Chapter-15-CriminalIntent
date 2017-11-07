@@ -9,6 +9,10 @@ import android.database.sqlite.SQLiteDatabase;
 import com.star.criminalintent.database.CrimeBaseHelper;
 import com.star.criminalintent.database.CrimeCursorWrapper;
 import com.star.criminalintent.database.CrimeDbSchema.CrimeTable;
+import com.star.criminalintent.database.CrimeDbSchema.SuspectTable;
+import com.star.criminalintent.database.SuspectCursorWrapper;
+import com.star.criminalintent.model.Crime;
+import com.star.criminalintent.model.Suspect;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -79,10 +83,17 @@ public class CrimeLab {
         Cursor cursor = mSQLiteDatabase.query(CrimeTable.TABLE_NAME, null, whereClause, whereArgs,
                 null, null, null);
 
-        return new CrimeCursorWrapper(cursor);
+        return new CrimeCursorWrapper(cursor, mContext);
     }
 
     public void removeCrime(Crime crime) {
+        Suspect suspect = crime.getSuspect();
+
+        if (suspect != null) {
+            suspect.setCrimeCount(suspect.getCrimeCount() - 1);
+            updateSuspect(suspect);
+        }
+
         mSQLiteDatabase.delete(CrimeTable.TABLE_NAME, CrimeTable.Cols.UUID + " = ? ",
                 new String[] { crime.getId().toString() });
     }
@@ -94,6 +105,65 @@ public class CrimeLab {
         contentValues.put(CrimeTable.Cols.DATE, crime.getDate().getTime());
         contentValues.put(CrimeTable.Cols.SOLVED, crime.isSolved() ? 1 : 0);
         contentValues.put(CrimeTable.Cols.REQUIRES_POLICE, crime.isRequiresPolice() ? 1 : 0);
+
+        if (crime.getSuspect() != null) {
+            contentValues.put(CrimeTable.Cols.SUSPECT, crime.getSuspect().getContactId());
+        }
+
+        return contentValues;
+    }
+
+    public Suspect getSuspect(String contactId) {
+
+        if (contactId == null) {
+            return null;
+        }
+
+        try (SuspectCursorWrapper suspectCursorWrapper = querySuspects(
+                SuspectTable.Cols.CONTACT_ID + " = ? ", new String[]{contactId})) {
+            if (suspectCursorWrapper.getCount() == 0) {
+                return null;
+            }
+
+            suspectCursorWrapper.moveToFirst();
+            return suspectCursorWrapper.getSuspect();
+        }
+    }
+
+    public void addSuspect(Suspect suspect) {
+        ContentValues contentValues = getContentValues(suspect);
+        mSQLiteDatabase.insert(SuspectTable.TABLE_NAME, null, contentValues);
+    }
+
+    public void updateSuspect(Suspect suspect) {
+        String uuidString = suspect.getId().toString();
+        ContentValues contentValues = getContentValues(suspect);
+        mSQLiteDatabase.update(SuspectTable.TABLE_NAME, contentValues,
+                SuspectTable.Cols.UUID + " = ? ", new String[]{uuidString});
+        if (suspect.getCrimeCount() == 0) {
+            removeSuspect(suspect);
+        }
+    }
+
+    public SuspectCursorWrapper querySuspects(String whereClause, String[] whereArgs) {
+        Cursor cursor = mSQLiteDatabase.query(SuspectTable.TABLE_NAME, null, whereClause, whereArgs,
+                null, null, null);
+
+        return new SuspectCursorWrapper(cursor, mContext);
+    }
+
+    public void removeSuspect(Suspect suspect) {
+        mSQLiteDatabase.delete(SuspectTable.TABLE_NAME, SuspectTable.Cols.UUID + " = ? ",
+                new String[] { suspect.getId().toString() });
+    }
+
+    private static ContentValues getContentValues(Suspect suspect) {
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(SuspectTable.Cols.UUID, suspect.getId().toString());
+        contentValues.put(SuspectTable.Cols.CONTACT_ID, suspect.getContactId());
+        contentValues.put(SuspectTable.Cols.DISPLAY_NAME, suspect.getDisplayName());
+        contentValues.put(SuspectTable.Cols.PHONE_NUMBER, suspect.getPhoneNumber());
+        contentValues.put(SuspectTable.Cols.CRIME_COUNT, suspect.getCrimeCount());
 
         return contentValues;
     }
