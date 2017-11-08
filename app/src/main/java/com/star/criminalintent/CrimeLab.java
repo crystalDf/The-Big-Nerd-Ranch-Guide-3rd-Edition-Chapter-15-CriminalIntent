@@ -63,6 +63,7 @@ public class CrimeLab {
             }
 
             crimeCursorWrapper.moveToFirst();
+
             return crimeCursorWrapper.getCrime();
         }
     }
@@ -126,6 +127,7 @@ public class CrimeLab {
             }
 
             suspectCursorWrapper.moveToFirst();
+
             return suspectCursorWrapper.getSuspect();
         }
     }
@@ -140,6 +142,7 @@ public class CrimeLab {
         ContentValues contentValues = getContentValues(suspect);
         mSQLiteDatabase.update(SuspectTable.TABLE_NAME, contentValues,
                 SuspectTable.Cols.UUID + " = ? ", new String[]{uuidString});
+
         if (suspect.getCrimeCount() == 0) {
             removeSuspect(suspect);
         }

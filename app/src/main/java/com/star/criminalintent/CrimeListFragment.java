@@ -187,6 +187,7 @@ public class CrimeListFragment extends Fragment {
         @Override
         public int getItemViewType(int position) {
             Crime crime = mCrimes.get(position);
+
             return crime.isRequiresPolice() ? REQUIRES_POLICE : NOT_REQUIRES_POLICE;
         }
     }
@@ -232,13 +233,9 @@ public class CrimeListFragment extends Fragment {
         CrimeLab crimeLab = CrimeLab.getInstance(getActivity());
         int crimeCount = crimeLab.getCrimes().size();
 
-        String subtitle;
-
-        if (crimeCount == 1) {
-            subtitle = getString(R.string.subtitle_singular_format);
-        } else {
-            subtitle = getString(R.string.subtitle_plural_format, crimeCount);
-        }
+        String subtitle = (crimeCount == 1)
+                ? getString(R.string.subtitle_singular_format)
+                : getString(R.string.subtitle_plural_format, crimeCount);
 
         if (!mSubtitleVisible) {
             subtitle = null;
