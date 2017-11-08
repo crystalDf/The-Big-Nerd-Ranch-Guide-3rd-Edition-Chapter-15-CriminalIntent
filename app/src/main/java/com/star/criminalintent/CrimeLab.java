@@ -141,7 +141,7 @@ public class CrimeLab {
         String uuidString = suspect.getId().toString();
         ContentValues contentValues = getContentValues(suspect);
         mSQLiteDatabase.update(SuspectTable.TABLE_NAME, contentValues,
-                SuspectTable.Cols.UUID + " = ? ", new String[]{uuidString});
+                SuspectTable.Cols.UUID + " = ? ", new String[] { uuidString });
 
         if (suspect.getCrimeCount() == 0) {
             removeSuspect(suspect);
